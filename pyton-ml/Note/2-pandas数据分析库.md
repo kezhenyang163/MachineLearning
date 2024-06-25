@@ -224,12 +224,12 @@ import numpy as np
 df = pd.DataFrame(data = np.random.randint(0,150,size = [10,3]),# 计算机科目的考试成绩
                   index = list('ABCDEFGHIJ'),# 行标签
                   columns=['Python','Tensorflow','Keras'])
-df.iloc[4] # 用整数位置选择。
-df.iloc[2:8,0:2] # 用整数切片，类似NumPy
-df.iloc[[1,3,5],[0,2,1]] # 整数列表按位置切片
-df.iloc[1:3,:] # 行切片
-df.iloc[:,:2] # 列切片
-df.iloc[0,2] # 选取标量值
+df.iloc[4] # 用整数位置选择。				 [选取第四行]
+df.iloc[2:8,0:2] # 用整数切片，类似NumPy 	  [选取3-8行 前两列]
+df.iloc[[1,3,5],[0,2,1]] # 整数列表按位置切片 [选取2 4 6 行  1 3 2 列]
+df.iloc[1:3,:] # 行切片 				     [选取2-3行]
+df.iloc[:,:2] # 列切片 					[选取所有行 前两列]
+df.iloc[0,2] # 选取标量值 				   [选取指定位置的元素]
 ```
 
 ### 第四节 boolean索引
