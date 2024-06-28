@@ -283,9 +283,9 @@ df2 = pd.DataFrame(data = np.random.randint(0,150,size = [10,3]),# 计算机科�
 df3 = pd.DataFrame(data = np.random.randint(0,150,size = (10,2)),
                   index = list('ABCDEFGHIJ'),
                   columns=['PyTorch','Paddle'])
-pd.concat([df1,df2],axis = 0) # df1和df2行串联，df2的行追加df2行后面
+pd.concat([df1,df2],axis = 0) # df1和df2行串联，df2的行追加df1行后面
 df1.append(df2) # 在df1后面追加df2
-pd.concat([df1,df3],axis = 1) # df1和df2列串联，df2的列追加到df1列后面
+pd.concat([df1,df3],axis = 1) # df1和df3列串联，df3的列追加到df1列后面
 ```
 
 ### 第二节 插入
@@ -297,7 +297,7 @@ df = pd.DataFrame(data = np.random.randint(0,151,size = (10,3)),
                   index = list('ABCDEFGHIJ'),
                   columns = ['Python','Keras','Tensorflow'])
 df.insert(loc = 1,column='Pytorch',value=1024) # 插入列
-df
+
 # 对行的操作，使用追加append，默认在最后面，无法指定位置
 # 如果想要在指定位置插入行：切割-添加-合并
 ```
@@ -906,7 +906,7 @@ job.drop_duplicates(inplace = True) # 删除重复数据
   SPSS/SAS
   处理方式： 如果job_detail中含有上述五类，则赋值为1，不含有则为0
 * ```python
-
+  
   job["job_detail"] = job["job_detail"].str.lower().fillna("")  #将字符串小写化，并将缺失值赋值为空字符串
   job["Python"] = job["job_detail"].map(lambda x:1 if ('python' in x) else 0)
   job["SQL"] = job["job_detail"].map(lambda x:1 if ('sql' in x) or ('hive' in x)  else 0)
@@ -944,3 +944,29 @@ job.drop_duplicates(inplace = True) # 删除重复数据
 - 对**性能进行了高度优化**，用Cython或C编写了关键代码路径。
 - Python与pandas在广泛的**学术和商业**领域中使用，包括金融，神经科学，经济学，统计学，广告，网络分析，等等
 - 学到这里，体会一会pandas库的亮点，如果对哪些还不熟悉，请对之前知识点再次进行复习。
+
+## pandas 库 Q&A
+
+1. pandas中 .loc` 和 `.iloc 的区别是什么？
+
+   ```
+   .loc:
+   	用法: df.loc[行标签, 列标签]
+   	.loc 用于基于标签的索引，即使用轴上的标签来选择数据。
+   	返回一个包含所请求标签的 DataFrame 或 Series
+   	行标签可以是单个标签、多个标签列表或标签的切片。
+   .iloc：
+   	用法：df.iloc[行索引, 列索引]
+   	.iloc 用于基于整数位置的索引，即使用整数索引来选择数据。
+   	它返回的是从原始数据中选择的整数位置的 DataFrame 或 Series。
+   	行和列的选择必须使用整数索引，可以是单个整数、整数列表或整数的切片。
+   
+   用法上的注意事项：
+   使用 .loc 时，如果指定的标签不存在，但存在该范围内的标签，Pandas 会返回一个空的 DataFrame 或 Series。如果需要避免这种情况，应该使用 .loc[] 时加上 dropna() 方法。
+   使用 .iloc 时，如果索引超出了 DataFrame 的范围，Pandas 会抛出一个 IndexError 异常。因此，在使用 .iloc 之前，应该确保索引在有效范围内。
+   当使用切片时，.loc 和 .iloc 的行为类似，但 .loc 允许使用标签的切片，而 .iloc 则使用整数的切片。
+   可以在 .loc 和 .iloc 后面链式使用 [] 来选择多个列或行。
+   在进行数据选择时，.loc 可以用来选择 DataFrame 的行标签和列标签，而 .iloc 只可以用来选择行和列的位置。
+   ```
+
+   
