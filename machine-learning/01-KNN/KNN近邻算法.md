@@ -37,13 +37,62 @@ distance_{AB} = \sqrt{\sum_{i=1}^n(x_i - y_i)^2}
 $$
 #### 1.4、KNN超参数
 
-* 邻居
+```
+KNN超参数解释:
+KNeighborsClassifier(
+    n_neighbors=5,
+    *,
+    weights='uniform',
+    algorithm='auto',
+    leaf_size=30,
+    p=2,
+    metric='minkowski',
+    metric_params=None,
+    n_jobs=None,
+)
+```
 
-* weights权重，话语权：uniform、distance
+`KNeighborsClassifier` 是 Python 的 `scikit-learn` 库中实现的 K-最近邻分类器。以下是该分类器中各个超参数的解释：
 
-* p = 1、2
+1. **n_neighbors** (`int`): 
+   - 指定了用于决策的最近邻居的数量。默认值为5。这个参数是最重要的超参数之一，因为它直接影响分类决策。
 
-* metrics = minkowski
+2. **weights** (`str` or `callable`):
+   - 指定在进行决策时如何为邻居分配权重。可以是以下两种：
+     - `'uniform'`：所有邻居的权重相同。
+     - `'distance'`：权重与距离成反比，即距离越近的邻居对决策的影响越大。
+     - 也可以是一个函数，该函数接受距离数组和返回权重数组。
+
+3. **algorithm** (`str` or `callable`):
+   - 指定用于搜索邻居的算法。可以是：
+     - `'auto'`：根据数据集的特征数量自动选择最合适的算法。
+     - `'ball_tree'`：使用球树数据结构。
+     - `'kd_tree'`：使用KD树数据结构。
+     - `'brute'`：使用暴力搜索，即直接计算每个点之间的距离。
+     - 也可以是一个自定义的函数。
+
+4. **leaf_size** (`int`):
+   - 用于确定树结构（如KD树或球树）中叶节点的最大大小。在构建树时，这个参数可以影响算法的效率。默认值为30。
+
+5. **p** (`int` or `float`):
+   - 指定闵可夫斯基距离的度量参数。当`p=1`时，它是曼哈顿距离；当`p=2`时，它是欧氏距离；当`p`趋向于无穷大时，它是切比雪夫距离。默认值为2。
+
+6. **metric** (`str` or `callable`):
+   - 指定用于计算距离的度量。可以是：
+     - `'minkowski'`：闵可夫斯基距离。
+     - `'euclidean'`：欧氏距离。
+     - `'manhattan'`：曼哈顿距离。
+     - `'chebyshev'`：切比雪夫距离。
+     - `'seuclidean'`：标准化欧氏距离。
+     - 也可以是一个自定义的距离度量函数。
+
+7. **metric_params** (`dict`):
+   - 用于传递给度量函数的额外参数。例如，如果使用`'minkowski'`度量，可以在这里指定`p`值。
+
+8. **n_jobs** (`int` or `None`):
+   - 指定在执行算法时并行运行的任务数量。如果设置为`None`，则使用CPU的可用核心数量。如果设置为负数，则使用所有可用的核心（1-表示使用除主核心外的所有核心）。
+
+这些超参数允许用户根据具体的数据集和问题调整KNN分类器，以获得最佳的性能。
 
 * p = 1 曼哈顿距离 p= 2 表示欧式距离
 
@@ -120,12 +169,53 @@ knn.score(X_test,y_test)
 
 ### 4、手写数字识别【实战案例】
 
-* 数据加载
-* 数据转换
-* 数据清洗
-* 算法建模
-* 算法预测
-* 数据可视化
+```python
+# 导入相关工具包
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+
+data = np.load('./digit.npy')
+# 随机选择一个索引，用于从数据集中选取一个图像进行展示。
+index = np.random.randint(0,5000,size = 1)[0]
+# 创建一个新的图形，并设置图形的大小为2x2英寸
+plt.figure(figsize=(2,2))
+plt.imshow(data[index])
+
+# 新建一个包含5000个元素的数组，每个数字0到9重复500次，代表图像的标签
+y = np.array([0,1,2,3,4,5,6,7,8,9]*500)
+y = np.sort(y)
+# 将图像数据从形状(5000, 28, 28)展平为(5000, 784)，每个图像变为一个784维的向量。
+data = data.reshape(5000,-1) 
+# 使用train_test_split函数将数据集分割为训练集和测试集，测试集占10%。
+X_train,X_test,y_train,y_test = train_test_split(data,y,test_size=0.1) 
+display(X_train.shape,X_test.shape)
+
+# 使用训练集数据拟合KNN模型。
+knn = KNeighborsClassifier(n_neighbors=10)
+knn.fit(X_train,y_train)
+
+# 使用拟合后的模型对测试集进行预测。
+y_ = knn.predict(X_test)
+display(y_test[:20],y_[:20])
+
+# 计算模型在测试集上的准确率。
+knn.score(X_test,y_test)
+
+# 创建一个新的图形，大小设置为5列2行，总共10个子图。
+plt.figure(figsize=(2*5,3*10))
+
+# 循环用于显示测试集中的前50个图像，每个图像旁边显示其真实标签和预测标签
+for i in range(50):
+    plt.subplot(10,5,i+1)
+    # 将测试集中的图像数据重新转换为28x28的图像，并显示。
+    plt.imshow(X_test[i].reshape(28,28))
+    plt.axis('off')
+    plt.title('True:%d\nPredict:%d' % (y_test[i],y_[i]))
+```
+
+
 
 ### 5、癌症诊断【实战案例】
 
